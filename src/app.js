@@ -23,6 +23,15 @@ app.get("/", (req, res) => {
   res.render("index");
 });
 
+app.get("/login", async (req, res) => {
+  try{
+     res.render("login")
+  }catch(err){
+   res.status(400).send(err)
+  } 
+ });
+ 
+
 app.post("/register", async (req, res) => {
  try{
     // const password = req.body.password
@@ -42,6 +51,21 @@ app.post("/register", async (req, res) => {
   res.status(400).send(err)
  } 
 });
+
+app.post("/login", async (req, res) => {
+  try{
+     const email = req.body.email
+     const password = req.body.password
+     
+     const userEmail = await Register.findOne({email:email})
+     
+     console.log(userEmail)
+     res.send(userEmail)
+  }catch(err){
+   res.status(400).send(err)
+  } 
+ });
+ 
 
 app.listen(port, () => {
   console.log(`Server is running at port no. ${port}`);
