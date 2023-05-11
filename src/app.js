@@ -4,6 +4,8 @@ const app = express();
 const hbs = require("hbs");
 require("./database/Connection");
 const Register = require("./models/register")
+const bcrypt = require("bcryptjs")
+const jwt = require("jsonwebtoken")
 
 const port = process.env.PORT || 8000;
 
@@ -42,6 +44,12 @@ app.post("/register", async (req, res) => {
           password:req.body.password,
           gender:req.body.gender,
         })
+
+        console.log("The success part" + registerEmployee)
+
+        const token = await registerEmployee.generateAuthToken()
+        console.log("The token part" + token)
+
         const registered = await registerEmployee.save()
         res.status(201).render("index")
     }else{
@@ -49,6 +57,7 @@ app.post("/register", async (req, res) => {
     }
  }catch(err){
   res.status(400).send(err)
+  console.log("The error part page")
  } 
 });
 
@@ -56,11 +65,18 @@ app.post("/login", async (req, res) => {
   try{
      const email = req.body.email
      const password = req.body.password
-     
+    
      const userEmail = await Register.findOne({email:email})
+     const isMatching = await bcrypt.compare(password,userEmail.password)
      
-     console.log(userEmail)
-     res.send(userEmail)
+     if(isMatching){
+      res.send(userEmail)
+      console.log(userEmail)
+     }
+     else{
+      res.send(`<h1> Entered Password is wrong ! </h1>`)
+     }
+
   }catch(err){
    res.status(400).send(err)
   } 
