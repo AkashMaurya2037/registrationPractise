@@ -38,6 +38,7 @@ app.post("/register", async (req, res) => {
  try{
     // const password = req.body.password
     if(req.body.password && req.body.name ){
+
         const registerEmployee = new Register({
           email:req.body.email,
           name:req.body.name,
@@ -46,18 +47,20 @@ app.post("/register", async (req, res) => {
         })
 
         console.log("The success part" + registerEmployee)
-
+      
         const token = await registerEmployee.generateAuthToken()
         console.log("The token part" + token)
 
         const registered = await registerEmployee.save()
+        console.log("The registered part" + registered)
+
         res.status(201).render("index")
     }else{
-      console.log("Please Enter the password")
+      res.send("Please Enter the password")
     }
  }catch(err){
   res.status(400).send(err)
-  console.log("The error part page")
+  console.log("The error part page " + err)
  } 
 });
 
@@ -67,6 +70,8 @@ app.post("/login", async (req, res) => {
      const password = req.body.password
     
      const userEmail = await Register.findOne({email:email})
+     const token = await userEmail.generateAuthToken()
+     console.log(token)
      const isMatching = await bcrypt.compare(password,userEmail.password)
      
      if(isMatching){
