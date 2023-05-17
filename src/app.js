@@ -50,8 +50,8 @@ app.post("/register", async (req, res) => {
       console.log("The token part" + token);
 
       res.cookie("jwt", token, {
-        // httpOnly:true,
-        expires: new Date(Date.now(), 120000),
+        httpOnly:true,
+        expires: new Date(Date.now()+ 60000),
       });
 
       const registered = await registerEmployee.save();
@@ -76,8 +76,9 @@ app.post("/login", async (req, res) => {
     const token = await userEmail.generateAuthToken();
 
     res.cookie("jwt", token, {
-      // httpOnly:true,
-      expires: new Date(Date.now(), 120000),
+      httpOnly:true,
+      expires: new Date(Date.now()+ 120000),
+      secure:true
     });
 
     console.log(token);

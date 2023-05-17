@@ -20,12 +20,12 @@ const registerSchema = new mongoose.Schema({
         type:String,
         required:true,
     },
-    tokens:[{
-        token:{
+    tokens:[
+        {token:{
             type:String,
             required:true
-        }
-    }]
+        }}
+    ]
 })
 
 
