@@ -7,6 +7,8 @@ require("./database/Connection");
 const Register = require("./models/register");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
+const cookieParser = require("cookie-parser")
+const auth = require("./Middleware/auth")
 
 const port = process.env.PORT || 8000;
 
@@ -15,6 +17,7 @@ const template_path = path.join(__dirname, "./templates/views");
 const registerPartials = path.join(__dirname, "./templates/partials");
 
 app.use(express.static(static_path));
+app.use(cookieParser())
 app.use(express.urlencoded({ extended: false }));
 
 app.set("view engine", "hbs");
@@ -32,6 +35,11 @@ app.get("/login", async (req, res) => {
     res.status(400).send(err);
   }
 });
+
+app.get("/cookie", auth ,(req, res)=>{
+  console.log(`This is the cookie : ${req.cookies.jwt}`)
+  res.render("cookie")
+})
 
 app.post("/register", async (req, res) => {
   try {

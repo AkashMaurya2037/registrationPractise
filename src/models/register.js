@@ -31,7 +31,6 @@ const registerSchema = new mongoose.Schema({
 
 registerSchema.methods.generateAuthToken = async function(){
     try {
-        console.log(this._id)
         const token = jwt.sign({_id:this._id.toString()}, process.env.SECRET_KEY )
         this.tokens = this.tokens.concat({token:token})
         await this.save()  
@@ -46,9 +45,9 @@ registerSchema.methods.generateAuthToken = async function(){
 registerSchema.pre("save", async function (next){
 
     if(this.isModified("password")){
-        console.log(`the current password is ${this.password}`)
+        // console.log(`the current password is ${this.password}`)
         this.password = await bcrypt.hash(this.password,10)
-        console.log(`the current password is ${this.password}`)
+        // console.log(`the current password is ${this.password}`)
         next()
     }
 })
