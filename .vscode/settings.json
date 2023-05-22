@@ -1,3 +1,5 @@
 {
-    "editor.mouseWheelZoom": true
+    "editor.mouseWheelZoom": true,
+    "workbench.activityBar.iconClickBehavior": "toggle",
+    "screencastMode.fontSize": 36
 }

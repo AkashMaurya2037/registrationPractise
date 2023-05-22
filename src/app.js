@@ -7,8 +7,8 @@ require("./database/Connection");
 const Register = require("./models/register");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
-const cookieParser = require("cookie-parser")
-const auth = require("./Middleware/auth")
+const cookieParser = require("cookie-parser");
+const auth = require("./Middleware/auth");
 
 const port = process.env.PORT || 8000;
 
@@ -17,7 +17,7 @@ const template_path = path.join(__dirname, "./templates/views");
 const registerPartials = path.join(__dirname, "./templates/partials");
 
 app.use(express.static(static_path));
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: false }));
 
 app.set("view engine", "hbs");
@@ -36,11 +36,6 @@ app.get("/login", async (req, res) => {
   }
 });
 
-app.get("/cookie", auth ,(req, res)=>{
-  console.log(`This is the cookie : ${req.cookies.jwt}`)
-  res.render("cookie")
-})
-
 app.post("/register", async (req, res) => {
   try {
     // const password = req.body.password
@@ -58,8 +53,8 @@ app.post("/register", async (req, res) => {
       console.log("The token part" + token);
 
       res.cookie("jwt", token, {
-        httpOnly:true,
-        expires: new Date(Date.now()+ 60000),
+        httpOnly: true,
+        expires: new Date(Date.now() + 60000),
       });
 
       const registered = await registerEmployee.save();
@@ -84,23 +79,46 @@ app.post("/login", async (req, res) => {
     const token = await userEmail.generateAuthToken();
 
     res.cookie("jwt", token, {
-      httpOnly:true,
-      expires: new Date(Date.now()+ 120000),
-      secure:true
+      httpOnly: true,
+      expires: new Date(Date.now() + 60000),
+      // secure: true,
     });
 
-    console.log(token);
+    console.log(`${token} Generated Token is Login`);
     const isMatching = await bcrypt.compare(password, userEmail.password);
 
     if (isMatching) {
       res.send(userEmail);
-      console.log(userEmail);
+      console.log(`${userEmail} Login Completed`);
     } else {
       res.send(`<h1> Entered Password is wrong ! </h1>`);
     }
   } catch (err) {
     res.status(400).send(err);
   }
+});
+
+app.get("/logout",auth, async (req, res) => {
+  try {
+    console.log(req.user);
+    req.user.tokens = req.user.tokens.filter((currElem)=>{
+      return currElem.token !== req.token
+    })
+    res.clearCookie("jwt");
+
+    console.log("Logout Successfully");
+
+    await req.user.save();
+    console.log(req.user + "Still Exist or not")
+    res.render("login");
+  } catch (err) {
+    res.status(500).send(err);
+  }
+});
+
+app.get("/cookie", auth, (req, res) => {
+  console.log(`This is the cookie : ${req.cookies.jwt}`);
+  res.render("cookie");
 });
 
 app.listen(port, () => {
