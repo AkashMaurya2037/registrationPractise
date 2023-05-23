@@ -100,7 +100,7 @@ app.post("/login", async (req, res) => {
 
 app.get("/logout",auth, async (req, res) => {
   try {
-    console.log(req.user);
+    // console.log(req.user);
     req.user.tokens = req.user.tokens.filter((currElem)=>{
       return currElem.token !== req.token
     })
@@ -109,7 +109,6 @@ app.get("/logout",auth, async (req, res) => {
     console.log("Logout Successfully");
 
     await req.user.save();
-    console.log(req.user + "Still Exist or not")
     res.render("login");
   } catch (err) {
     res.status(500).send(err);
@@ -119,6 +118,22 @@ app.get("/logout",auth, async (req, res) => {
 app.get("/cookie", auth, (req, res) => {
   console.log(`This is the cookie : ${req.cookies.jwt}`);
   res.render("cookie");
+});
+
+app.get("/logoutAll", auth, async (req, res) => {
+  try {
+
+    req.user.tokens = []
+
+    res.clearCookie("jwt")
+    
+    await req.user.save()
+    res.render("login");
+
+  } catch (error) {
+    console.log(error)
+    res.send(error)
+  }
 });
 
 app.listen(port, () => {
